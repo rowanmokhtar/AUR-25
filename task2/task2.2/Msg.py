@@ -2,56 +2,70 @@
 from time import time
 from rich.console import Console
 
-console=Console()
+console = Console()
+
 def send_Msg(msg):
-     if isinstance(msg, BaseMsg):
+    if isinstance(msg, BaseMsg):
         console.print(msg, style=msg.style)
-     else:
-       print(msg)
+    else:
+        print(msg)
+
 class BaseMsg:
-    def __init__(self,data:str):
-        self._data=data
-        
+    def __init__(self, data: str):
+        self._data = data
+
     @property
-    def style (self):
-        return'' #BaseMsg-specific
-    
+    def style(self):
+        return ''  # BaseMsg-specific
+
     @property
-    def data (self):
+    def data(self):
         return self._data
-    
-    def __str__(self):
-        return self._data  #BaseMsg-specific
-    
+
+    def __str__(self):   
+        return self._data  # BaseMsg-specific
+
     def __len__(self):
-       return len(self._data)
-    
-    def __eq__(self,other):
-        if isinstance(other ,BaseMsg):
-            return self._data == other._data
-        return False
-    
-    
-    def __add__(self,other):
+        return len(self._data)
+
+    def __eq__(self, other):
+        return isinstance(other, BaseMsg) and self._data == other._data
+
+    def __add__(self, other):
         if isinstance(other, BaseMsg):
             return BaseMsg(self._data + other._data)
-        return BaseMsg(self._data + str (other))
-    
+        return BaseMsg(self._data + str(other))
+
+
 class LogMsg(BaseMsg):
-    def __init__(self,data):
+    def __init__(self, data: str):
         super().__init__(data)
-        self._timestamps:int= 
-        
+        self._timestamp = int(time())  
+
+    @property
+    def style(self):
+      return "black on yellow"
+
+    def __str__(self):
+        return f"[{self._timestamp}] {self._data}"
+
+
 class WarnMsg(LogMsg):
-    #jhj
+    @property
+    def style(self):
+        
+        return "white on red"
+
+    def __str__(self):
+        
+        return f"[!WARN][{self._timestamp}] {self._data}"
 
 
+if __name__ == "__main__":
+    m1 = BaseMsg("normal message")
+    m2 = LogMsg("log message")
+    m3 = WarnMsg("warning message")
 
-if __name__=="__main__":
-  m1=BaseMsg('normal massage')
-  m2 = LogMsg('Log')
-  m3= WarnMsg('Warnning')
-  send_Msg(m1)
-  send_Msg(m2)
-  send_Msg(m3)     
-    
+    send_Msg(m1)
+    send_Msg(m2)
+    send_Msg(m3)
